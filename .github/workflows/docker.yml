@@ -21,6 +21,7 @@ permissions:
 env:
   UPSTREAM_REPOSITORY: MetaCubeX/mihomo
   REGISTRY: ghcr.io
+  GO_VERSION: 1.26.x
 
 jobs:
   prepare:
@@ -116,7 +117,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.25.x"
+          go-version: ${{ env.GO_VERSION }}
       - name: Build mihomo
         env:
           CGO_ENABLED: "0"
@@ -174,9 +175,9 @@ jobs:
               wget -O /root/.config/mihomo/geoip.metadb https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb && \
               wget -O /root/.config/mihomo/geosite.dat https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat && \
               wget -O /root/.config/mihomo/geoip.dat https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat
-          COPY mihomo /mihomo
+          COPY mihomo /usr/local/bin/mihomo
           VOLUME ["/root/.config/mihomo/"]
-          ENTRYPOINT ["/mihomo"]
+          ENTRYPOINT ["/usr/local/bin/mihomo"]
           DOCKERFILE
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -250,4 +251,3 @@ jobs:
             $(printf '${{ needs.prepare.outputs.image }}@sha256:%s ' *)
       - name: Inspect image
         run: docker buildx imagetools inspect "${{ needs.prepare.outputs.image }}:${{ needs.prepare.outputs.docker_tag }}"
-
